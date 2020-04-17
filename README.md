@@ -23,14 +23,12 @@ There is no load balancing setup available for the Rserve default protocol QAP.
 
 Note that newer version of Rserve supports http and WebSocket protocol which makes load balancing easier.  However, that requires appropriate clients to support the protocol. 
 
-### How it works?
-The cluster has a WebSocket tunnel as an entry point.  
+### How does it work?
+The cluster wrap QAP traffic within WebSocket tunnel for load balancing. The tunnel accept incoming connections and route them through a nginx load balancer to Rserve nodes.
 
-Incoming traffic is routed, through a nginx load balancer, to Rserve nodes.
+Within each RServe node, the WebSocket tunnel forwards the payload to the RServe QAP port on localhost.
 
-Each Rserve node has a WebSocket tunnel server to redirect data to Rserve's QAP port.
-
-Details of each service defined in `docker-compose.yml`:
+### Details of each service as defined in `docker-compose.yml`
 
 #### wstunnel (the rcloud container)
 This container is the entry point.  It runs the WebSocker tunnel program [wstunnel](https://github.com/erebe/wstunnel) and listen for incoming traffic on port `6133`.  The tunnel is connected to the proxy / load balancer.
@@ -49,9 +47,9 @@ To run multiple Rserve nodes with `docker-compose`, run it with `--compatibility
 ```
 docker-compose --compatibility up
 ```
-The number of nodes to run is determined the environment variable `RSERVE_NODE_NUM` as defined in `.env`
+The number of nodes to run is determined by the environment variable `RSERVE_NODE_NUM` as defined in `.env`
 
 ## Known issues / TODO
-- When testing this cluster with [WebWork](https://webwork.maa.org/), seems that some WebWork questions [do not close the connection explicitly](https://github.com/ubc/webwork-open-problem-library/blob/4a70698b65db0d3de862c9eda68a49c23da5e39d/OpenProblemLibrary/macros/UBC/RserveClient.pl#L135-L144).  This may cause dangling connections not clear
+- When testing this cluster with [WebWork](https://webwork.maa.org/), seems that some WebWork questions [do not close the connection explicitly](https://github.com/ubc/webwork-open-problem-library/blob/4a70698b65db0d3de862c9eda68a49c23da5e39d/OpenProblemLibrary/macros/UBC/RserveClient.pl#L135-L144).  This may cause dangling connections not cleared
 - Make the load balance image to take environment variables and setup upstream servers at runtime instead of hard-coded in the image
 - Make the tunneling port etc configurable at runtime via environment variables
