@@ -1,0 +1,16 @@
+FROM ubcctlt/rserve
+
+COPY conf/rserve-entrypoint.sh /
+
+RUN cd /root && \
+    wget https://github.com/erebe/wstunnel/releases/download/v3.0/wstunnel-linux-x64.zip && \
+    unzip wstunnel-linux-x64.zip && \
+    chmod a+x ./wstunnel && \
+    rm wstunnel-linux-x64.zip && \
+    chmod a+x /rserve-entrypoint.sh
+
+
+# expose the port that the WebSocket tunnel listening
+EXPOSE 8000
+
+CMD ["/rserve-entrypoint.sh"]

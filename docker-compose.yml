@@ -1,0 +1,37 @@
+version: '3'
+####
+# !! remember define RSERVE_NODE_NUM in .env or as environment variable
+####
+
+services:
+  wstunnel:
+    container_name: rcloud
+    build:
+      context: .
+      dockerfile: Dockerfile-wstunnel
+    expose:
+      - "6311"
+    entrypoint: ["/root/wstunnel", "-L", "0.0.0.0:6311:127.0.0.1:6311", "ws://load_balancer:8080"]
+    ports:
+      - "6311:6311"
+
+  proxy:
+    container_name: load_balancer
+    expose:
+      - "8080"
+    build:
+      context: .
+      dockerfile: Dockerfile-proxy
+      args:
+        BUILDTIME_RSERVE_NODE_NUM: ${RSERVE_NODE_NUM}
+
+  rserve:
+    image: rserve
+    build:
+      context: .
+      dockerfile: Dockerfile-rserve
+    # if you are using "docker-compose up"to start multiple Rserve containers,
+    # add "--compatibility" flag so the "deploy" section works
+    deploy:
+      mode: replicated
+      replicas: ${RSERVE_NODE_NUM}
