@@ -24,17 +24,17 @@ There is no load balancing setup available for the Rserve default protocol QAP.
 Note that newer version of Rserve supports http and WebSocket protocol which makes load balancing easier.  However, that requires appropriate clients to support the protocol. 
 
 ### How does it work?
-The cluster wrap QAP traffic within WebSocket tunnel for load balancing. The tunnel accept incoming connections and route them through a nginx load balancer to Rserve nodes.
+The cluster wraps QAP traffic within WebSocket tunnel for load balancing. The tunnel accepts incoming connections and routes them through a nginx load balancer to upstream Rserve nodes.
 
-Within each RServe node, the WebSocket tunnel forwards the payload to the RServe QAP port on localhost.
+Within each RServe node, the WebSocket tunnel forwards the payload to the RServe QAP port on the localhost.
 
 ### Details of each service as defined in `docker-compose.yml`
 
 #### wstunnel (the rcloud container)
-This container is the entry point.  It runs the WebSocker tunnel program [wstunnel](https://github.com/erebe/wstunnel) and listen for incoming traffic on port `6133`.  The tunnel is connected to the proxy / load balancer.
+This container is the entry point.  It runs the WebSocker tunnel program [wstunnel](https://github.com/erebe/wstunnel) and listens for incoming traffic on port `6133`.  The tunnel is connected to the proxy / load balancer.
 
 #### proxy (the load_balancer container)
-This container runs nginx as reverse proxy.  Connections are routed to upstream Rserve nodes.
+This container runs nginx as reverse proxy.  WebSocket connections are routed to upstream Rserve nodes.
 
 Note that the docker file `Dockerfile-proxy` has steps to add appropriate entries of upstream nodes into nginx config file. To build the docker image, edit `.env` and set the variable `RSERVE_NODE_NUM` for the number of nodes.  Then run
 ```
