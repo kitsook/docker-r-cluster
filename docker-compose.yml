@@ -4,32 +4,21 @@ version: '3'
 ####
 
 services:
-  wstunnel:
-    container_name: rcloud
-    build:
-      context: .
-      dockerfile: Dockerfile-wstunnel
-    expose:
-      - "6311"
-    entrypoint: ["/root/wstunnel", "-L", "0.0.0.0:6311:127.0.0.1:6311", "ws://load_balancer:8080"]
-    ports:
-      - "6311:6311"
 
   proxy:
-    container_name: load_balancer
+    container_name: rcloud
     expose:
-      - "8080"
+      - "6311"
     build:
       context: .
       dockerfile: Dockerfile-proxy
       args:
         BUILDTIME_RSERVE_NODE_NUM: ${RSERVE_NODE_NUM}
+    ports:
+      - "6311:6311"
 
   rserve:
-    image: rserve
-    build:
-      context: .
-      dockerfile: Dockerfile-rserve
+    image: ubcctlt/rserve
     # if you are using "docker-compose up"to start multiple Rserve containers,
     # add "--compatibility" flag so the "deploy" section works
     deploy:
