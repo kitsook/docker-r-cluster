@@ -10,7 +10,7 @@ Start the cluster with:
 docker-compose --compatibility up -d
 ```
 
-The started `proxy` container is the entry point to the cluster. It acts like a Rserv node listening on port 6311.  Add it to your docker network that needs to access Rserve, e.g.
+The started `rcloud` container is the entry point to the cluster. It acts like a Rserv node listening on port 6311.  Add it to your docker network that needs to access Rserve, e.g.
  ```
  docker network connect webwork2_default proxy
  ```
